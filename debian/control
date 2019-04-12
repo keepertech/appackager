@@ -1,0 +1,7 @@
+Package: kt-appackager
+Version: VERSION
+Description: Application packager built on top of pipenv
+Maintainer: Keeper Technology, LLC
+Architecture: all
+Priority: optional
+Depends: kt-python37

@@ -1,0 +1,12 @@
+*.pyc
+*.pyo
+*.swp
+*.egg-info
+/.DS_Store
+/.autoversion
+/.coverage*
+/.tox/
+/build/
+/dist/
+/htmlcov/
+/packages/
