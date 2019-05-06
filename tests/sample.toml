@@ -1,0 +1,83 @@
+
+autoversion-state = ".autoversion.json"
+
+[package]
+# Name of operating system package
+name = "kt-appackager"
+
+description = "Keeper Technology application builder."
+maintainer = "Keeper Technology LLC"
+
+# Debian package priority:
+priority = "optional"
+
+
+[dependencies]
+# Values in this section must be lists of individual package
+# specifications; version constraints must be included in the
+# specification in Debian syntax.
+
+# Prerequisites:
+requires = [
+  "kt-python37",
+]
+# (same as Debian's depends)
+
+# Cannot coexist:
+conflicts = []
+# Additional, virtual packages provided:
+provides = []
+
+# These are RPM specific, so... avoid if .deb packages are required.
+# Not yet implemented.
+#
+# recommends = []
+# suggests = []
+# replaces = []
+# breaks = []
+
+
+[installation]
+
+# Where should the software be installed?
+#
+# This will be the top-level directory containing the software installation.
+#
+directory = "/opt/insight-agent"
+
+# Python executable we depend on:
+python = "/opt/kt-python37/bin/python3"
+
+
+[scripts]
+# General settings that apply to all scripts; most importantly, default
+# initialization setting.
+
+initialization = """
+import kt.tracing
+
+kt.tracing.bootstrap()
+"""
+
+
+[script.ki-spaces]
+entry-point = "some-package:entry-point-name"
+
+[script.script-name]
+#
+# entry point: no second colon:
+#
+entry-point = "package:entry-point-name"
+# Override initialization from [scripts]:
+initialization = """
+  import kt.tracing
+
+  kt.tracing.disable()
+  """
+
+[script.script-next]
+#
+# entry point from "this" package: no second colon
+# (requires setup.py in "this" directory):
+#
+entry-point = "entry-point-name"

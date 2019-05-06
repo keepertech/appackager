@@ -39,15 +39,17 @@ metadata = dict(
     install_requires=[
         'kt.common',
         'kt.testing>=3.1.0',
+        'toml',
         'zope.exceptions',
     ],
     entry_points={
         'console_scripts': [
+            'appackage = kt.appackager.build:main',
         ],
     },
     classifiers=[
         'Programming Language :: Python :: 3 :: Only',
-        'Programming Language :: Python :: 3.5',
+        # 'Programming Language :: Python :: 3.5',
         'Programming Language :: Python :: 3.6',
         'Programming Language :: Python :: 3.7',
     ],
