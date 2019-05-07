@@ -1,0 +1,26 @@
+
+[package]
+# Name of operating system package
+name = "kt-appackager"
+
+description = "Keeper Technology application builder."
+maintainer = "Keeper Technology LLC"
+
+
+[dependencies]
+# Values in this section must be lists of individual package
+# specifications; version constraints must be included in the
+# specification in Debian syntax.
+
+requires = [
+  "kt-python37",
+]
+
+
+[installation]
+directory = "/opt/appackager"
+python = "/opt/kt-python37/bin/python3"
+
+
+[script.appackage]
+entry-point = "appackage"

@@ -1,5 +1,5 @@
 
-autoversion-state = ".autoversion.json"
+autoversion-file = .autoversion.json
 
 [package]
 # Name of operating system package
@@ -10,6 +10,7 @@ maintainer = "Keeper Technology LLC"
 
 # Debian package priority:
 priority = "optional"
+# Is there an RPM equivalent?
 
 
 [dependencies]

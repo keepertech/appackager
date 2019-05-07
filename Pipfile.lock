@@ -1,0 +1,20 @@
+{
+    "_meta": {
+        "hash": {
+            "sha256": "f044846fa3f416ad381e4c811982632db085a25f31a73295df35addf732118f2"
+        },
+        "pipfile-spec": 6,
+        "requires": {},
+        "sources": [
+            {
+                "url": "https://keeper:Keeper1SS@devpi.keepertech.com/keeper/prod/+simple/"
+            }
+        ]
+    },
+    "default": {
+        "e1839a8": {
+            "path": "."
+        }
+    },
+    "develop": {}
+}

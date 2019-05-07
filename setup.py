@@ -38,8 +38,8 @@ metadata = dict(
     include_package_data=True,
     install_requires=[
         'kt.common',
-        'kt.testing>=3.1.0',
         'toml',
+        'wheel',
         'zope.exceptions',
     ],
     entry_points={
@@ -49,7 +49,6 @@ metadata = dict(
     },
     classifiers=[
         'Programming Language :: Python :: 3 :: Only',
-        # 'Programming Language :: Python :: 3.5',
         'Programming Language :: Python :: 3.6',
         'Programming Language :: Python :: 3.7',
     ],

@@ -17,6 +17,7 @@ import toml
 
 
 DEFAULT_AUTOVERSION_FILE = '.autoversion.json'
+DEFAULT_HOOK_SCRIPTS = 'debian'
 
 logger = logging.getLogger(__name__)
 
@@ -38,6 +39,8 @@ class ArgumentParser(argparse.ArgumentParser):
         namespace.config = Configuration(toml.load(namespace.configuration))
         return namespace
 
+
+_marker = object()
 
 _toml_types = {
     'boolean': bool,
@@ -62,14 +65,18 @@ class Configuration(object):
         self.python = self._get('installation', 'python')
 
         try:
+            self.hook_scripts = self._config['package'].get('hook-scripts')
+        except KeyError:
+            self.hook_scripts = DEFAULT_HOOK_SCRIPTS
+
+        try:
             self.arch_specific = self._get('package', 'architecture-specific',
                                            type='boolean')
         except KeyError:
             self.arch_specific = False
 
         try:
-            self.autoversion_file = self._get(
-                'autoversion-file', type='boolean')
+            self.autoversion_file = self._get('autoversion-file')
         except KeyError:
             self.autoversion_file = DEFAULT_AUTOVERSION_FILE
 
@@ -77,7 +84,7 @@ class Configuration(object):
         self.conflicts = self._dependencies('conflicts')
         self.provides = self._dependencies('provides')
 
-    def _get(self, *names, type='string'):
+    def _get(self, *names, type='string', default=_marker):
         table_names, name = self._split_names(names)
         path = ''
         cfg = self._config
@@ -85,10 +92,17 @@ class Configuration(object):
             if path:
                 path += '.'
             path += nm
-            cfg = cfg[nm]
+            try:
+                cfg = cfg[nm]
+            except KeyError:
+                if default is not _marker:
+                    return default
+                raise
             if not isinstance(cfg, dict):
                 raise TypeError(f'[{path}] must be a table')
-        value = cfg[name]
+        value = cfg.get(name, default)
+        if value is _marker:
+            raise KeyError(f'[{path}] {name} is not configured')
         vtype = _toml_types[type]
         if not isinstance(value, vtype):
             raise TypeError(f'[{path}] {name} must be a {type};'
@@ -119,15 +133,7 @@ class Configuration(object):
         return names[:-1], names[-1]
 
     def _scripts(self):
-        section = self._config.get('scripts', {})
-        if not isinstance(section, dict):
-            raise TypeError('[scripts] must be a table')
-        initialization = section.get('initialization')
-        if isinstance(initialization, str):
-            initialization = section['initialization']
-        elif initialization is not None:
-            raise TypeError('[scripts] initialization must be a string')
-
+        initialization = self._get('scripts', 'initialization', default='')
         section = self._config.get('script', {})
         if not isinstance(section, dict):
             raise TypeError('[script] must be a table')
