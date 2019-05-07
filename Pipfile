@@ -4,4 +4,7 @@
 url = "https://keeper:Keeper1SS@devpi.keepertech.com/keeper/prod/+simple/"
 
 [packages]
-"e1839a8" = {path = "."}
+toml = "*"
+wheel = "*"
+
+e1839a8 = {path = "."}

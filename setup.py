@@ -37,10 +37,8 @@ metadata = dict(
     namespace_packages=['kt'],
     include_package_data=True,
     install_requires=[
-        'kt.common',
         'toml',
         'wheel',
-        'zope.exceptions',
     ],
     entry_points={
         'console_scripts': [
