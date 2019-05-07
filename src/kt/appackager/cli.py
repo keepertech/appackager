@@ -64,21 +64,14 @@ class Configuration(object):
         self.directory = self._get('installation', 'directory')
         self.python = self._get('installation', 'python')
 
-        try:
-            self.hook_scripts = self._config['package'].get('hook-scripts')
-        except KeyError:
-            self.hook_scripts = DEFAULT_HOOK_SCRIPTS
+        self.hook_scripts = self._get('package', 'hook-scripts',
+                                      default=DEFAULT_HOOK_SCRIPTS)
 
-        try:
-            self.arch_specific = self._get('package', 'architecture-specific',
-                                           type='boolean')
-        except KeyError:
-            self.arch_specific = False
+        self.arch_specific = self._get('package', 'architecture-specific',
+                                       type='boolean', default=False)
 
-        try:
-            self.autoversion_file = self._get('autoversion-file')
-        except KeyError:
-            self.autoversion_file = DEFAULT_AUTOVERSION_FILE
+        self.autoversion_file = self._get('autoversion-file',
+                                          default=DEFAULT_AUTOVERSION_FILE)
 
         self.requires = self._dependencies('requires')
         self.conflicts = self._dependencies('conflicts')

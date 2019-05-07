@@ -1,5 +1,5 @@
 
-autoversion-file = .autoversion.json
+autoversion-file = ".autoversion.json"
 
 [package]
 # Name of operating system package

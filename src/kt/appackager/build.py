@@ -70,6 +70,13 @@ class Build(object):
 
     need_autoversion = False
 
+    # We excise these since they're part of the base Python installation
+    # now.
+    packages_to_excise = (
+        'pip',
+        'setuptools',
+    )
+
     def __init__(self, config):
         self.config = config
         self.console_scripts = {}
@@ -124,6 +131,8 @@ class Build(object):
             assert self.site_packages.endswith('/site-packages')
             pythondir = os.path.basename(os.path.dirname(self.site_packages))
             self.pythondir = pythondir
+
+            self.excise_packages()
 
             libpython = installation + '/lib/' + pythondir
             os.makedirs(topdir + libpython)
@@ -200,6 +209,34 @@ class Build(object):
             subprocess.check_call(
                 ['chmod', 'a-w', os.path.join('packages', debname)])
             subprocess.check_call(['chmod', '-R', 'u+w', tmpdir])
+
+    def excise_packages(self):
+        outside_prefix = os.pardir + os.sep
+        # The set of dirs in site-packages we touched.
+        dirs = set()
+        for pkgname in self.packages_to_excise:
+            distinfo = self.get_package_distinfo(pkgname)
+            record = os.path.join(distinfo, 'RECORD')
+            for line in open(record):
+                path, chksum, size = line.rsplit(',', 2)
+                if path.startswith(outside_prefix):
+                    # Not under site-packages; stay away.
+                    continue
+                dirs.add(path.split(os.sep, 1)[0])
+                path = os.path.normpath(os.path.join(self.site_packages, path))
+                if os.path.exists(path):
+                    os.unlink(path)
+        for dirname in dirs:
+            path = os.path.normpath(os.path.join(self.site_packages, dirname))
+            for dirpath, dirnames, filenames in os.walk(path, topdown=False):
+                # Need to re-compute dirnames, since we may have removed
+                # the directories that are included.
+                dirnames = {dname for dname in dirnames
+                            if os.path.isdir(os.path.join(dirpath, dname))}
+                if filenames or dirnames:
+                    print(f'directory {dirpath} not empty')
+                else:
+                    os.rmdir(dirpath)
 
     def next_version(self):
         stdout = subprocess.check_output(
@@ -303,11 +340,9 @@ class Build(object):
         return self._local_package
 
     def get_console_scripts(self, pkgname):
-        pattern = os.path.join(self.site_packages, f'{pkgname}-*.dist-info')
-        dirs = glob.glob(pattern)
-        assert len(dirs) == 1, dirs
+        distinfo = self.get_package_distinfo(pkgname)
         console_scripts = {}
-        entry_point_path = os.path.join(dirs[0], 'entry_points.txt')
+        entry_point_path = os.path.join(distinfo, 'entry_points.txt')
         try:
             with open(entry_point_path) as f:
                 cfg = configparser.RawConfigParser()
@@ -317,6 +352,12 @@ class Build(object):
         except Exception:
             pass
         self.console_scripts[pkgname] = console_scripts
+
+    def get_package_distinfo(self, pkgname):
+        pattern = os.path.join(self.site_packages, f'{pkgname}-*.dist-info')
+        dirs = glob.glob(pattern)
+        assert len(dirs) == 1, dirs
+        return dirs[0]
 
 
 def error(message):
