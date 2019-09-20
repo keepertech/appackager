@@ -92,8 +92,8 @@ class Build(object):
         arch_specific = self.config.arch_specific
         if arch_specific:
             arch = subprocess.check_output(
-                ['dpkg-architecture', '-q', 'DEB_BUILD_ARCH']).strip()
-            arch = str(arch, 'utf-8')
+                ['dpkg-architecture', '-q', 'DEB_BUILD_ARCH'])
+            arch = str(arch, 'utf-8').strip()
         else:
             arch = 'all'
 
@@ -102,8 +102,9 @@ class Build(object):
 
         with tempfile.TemporaryDirectory() as tmpdir:
             topdir = os.path.join(tmpdir, pkgdirname)
+            debdir = os.path.join(topdir, 'DEBIAN')
             os.mkdir(topdir)
-            os.mkdir(os.path.join(topdir, 'DEBIAN'))
+            os.mkdir(debdir)
 
             installation = self.config.directory
             assert installation.startswith('/')
@@ -115,8 +116,8 @@ class Build(object):
                 ['pipenv', '--bare', 'install',
                  '--python', self.config.python])
 
-            venvdir = subprocess.check_output(['pipenv', '--venv']).strip()
-            venvdir = str(venvdir, 'utf-8')
+            venvdir = subprocess.check_output(['pipenv', '--venv'])
+            venvdir = str(venvdir, 'utf-8').strip()
 
             # Determine where site-packages is, because we need that to
             # locate the *.dist-info directories, so we can make use of the
@@ -125,8 +126,8 @@ class Build(object):
             pip_init = subprocess.check_output(
                 ['pipenv', 'run', 'python', '-c',
                  'import os, pip\n'
-                 'print(os.path.abspath(pip.__file__))']).strip()
-            pip_init = str(pip_init, 'utf-8')
+                 'print(os.path.abspath(pip.__file__))'])
+            pip_init = str(pip_init, 'utf-8').strip()
             self.site_packages = os.path.dirname(os.path.dirname(pip_init))
             assert self.site_packages.endswith('/site-packages')
             pythondir = os.path.basename(os.path.dirname(self.site_packages))
@@ -170,9 +171,9 @@ class Build(object):
                 # TODO: Limit the allowed names of the script files to those
                 # that make sense as Debian installation hooks.
                 basename = os.path.basename(shscript)
-                shutil.copy(shscript, os.path.join(topdir, 'DEBIAN', basename))
+                shutil.copy(shscript, os.path.join(debdir, basename))
 
-            with open(topdir + '/DEBIAN/control', 'w') as f:
+            with open(debdir + '/control', 'w') as f:
                 print(f'Package: {self.config.name}', file=f)
                 print(f'Version: {version}-1', file=f)
                 if self.config.description:
