@@ -112,60 +112,61 @@ class Build(object):
             print(f'Building {self.config.name} in {topdir}')
             print(f'Installation directory: {installation}')
 
-            subprocess.check_output(
-                ['pipenv', '--bare', 'install',
-                 '--python', self.config.python])
+            with SavedPipenvVenv():
+                subprocess.check_output(
+                    ['pipenv', '--bare', 'install',
+                     '--python', self.config.python])
 
-            venvdir = subprocess.check_output(['pipenv', '--venv'])
-            venvdir = str(venvdir, 'utf-8').strip()
+                # Determine where site-packages is, because we need that
+                # to locate the *.dist-info directories, so we can make
+                # use of the entry point metadata.
+                #
+                pip_init = subprocess.check_output(
+                    ['pipenv', 'run', 'python', '-c',
+                     'import os, pip\n'
+                     'print(os.path.abspath(pip.__file__))'])
+                pip_init = str(pip_init, 'utf-8').strip()
+                self.site_packages = os.path.dirname(os.path.dirname(pip_init))
+                assert self.site_packages.endswith('/site-packages')
+                pythondir = os.path.basename(
+                    os.path.dirname(self.site_packages))
+                self.pythondir = pythondir
 
-            # Determine where site-packages is, because we need that to
-            # locate the *.dist-info directories, so we can make use of the
-            # entry point metadata.
-            #
-            pip_init = subprocess.check_output(
-                ['pipenv', 'run', 'python', '-c',
-                 'import os, pip\n'
-                 'print(os.path.abspath(pip.__file__))'])
-            pip_init = str(pip_init, 'utf-8').strip()
-            self.site_packages = os.path.dirname(os.path.dirname(pip_init))
-            assert self.site_packages.endswith('/site-packages')
-            pythondir = os.path.basename(os.path.dirname(self.site_packages))
-            self.pythondir = pythondir
+                self.excise_packages()
 
-            self.excise_packages()
+                libpython = installation + '/lib/' + pythondir
+                os.makedirs(topdir + libpython)
 
-            libpython = installation + '/lib/' + pythondir
-            os.makedirs(topdir + libpython)
+                # ---
 
-            # ---
+                os.chdir(self.site_packages)
+                pack = subprocess.Popen(
+                    ['tar', 'c', '.'], stdout=subprocess.PIPE)
+                unpack = subprocess.Popen(
+                    ['tar', 'x', '-C', topdir + libpython], stdin=pack.stdout)
+                pack.stdout.close()
+                out, err = unpack.communicate()
 
-            os.chdir(self.site_packages)
-            pack = subprocess.Popen(['tar', 'c', '.'], stdout=subprocess.PIPE)
-            unpack = subprocess.Popen(['tar', 'x', '-C', topdir + libpython],
-                                      stdin=pack.stdout)
-            pack.stdout.close()
-            out, err = unpack.communicate()
+                # ---
 
-            # ---
+                os.chdir(topdir + libpython)
+                subprocess.run(
+                    [self.config.python, '-m', 'compileall', '-fqq',
+                     '-d', libpython, '.'])
+                subprocess.check_call(
+                    ['chmod', '-R', 'go-w', topdir + installation])
+                os.chdir(workdir)
 
-            os.chdir(topdir + libpython)
-            subprocess.run(
-                [self.config.python, '-m', 'compileall', '-fqq',
-                 '-d', libpython, '.'])
-            subprocess.check_call(
-                ['chmod', '-R', 'go-w', topdir + installation])
-            os.chdir(workdir)
-
-            # mkscripts
-            if self.config.scripts:
-                bindir = topdir + installation + '/bin'
-                os.mkdir(bindir)
-                for script in self.config.scripts:
-                    self.make_script(script, bindir)
-                subprocess.check_call(['chmod', '-R', 'a-w', bindir])
-
-            shutil.rmtree(venvdir)
+                # Generate scripts while we still have the build venv;
+                # we need it to collect the entry point data from the
+                # *.dist-info directories.
+                #
+                if self.config.scripts:
+                    bindir = topdir + installation + '/bin'
+                    os.mkdir(bindir)
+                    for script in self.config.scripts:
+                        self.make_script(script, bindir)
+                    subprocess.check_call(['chmod', '-R', 'a-w', bindir])
 
             for shscript in glob.glob('debian/*'):
                 # TODO: Limit the allowed names of the script files to those
@@ -359,6 +360,56 @@ class Build(object):
         dirs = glob.glob(pattern)
         assert len(dirs) == 1, dirs
         return dirs[0]
+
+
+class SavedPipenvVenv(object):
+
+    def __init__(self):
+        super(SavedPipenvVenv, self).__init__()
+        self.moved_aside = None
+        self.original = self.locate()
+
+    def locate(self):
+        venv = None
+        cp = subprocess.run(['pipenv', '--venv'],
+                            capture_output=True, encoding='utf-8')
+        if not cp.returncode:
+            venv = cp.stdout
+            if venv.endswith('\n'):
+                venv = venv[:-1]
+        return venv
+
+    def __enter__(self):
+        if self.original:
+            self.moved_aside = self.original + '-saved'
+            if os.path.isdir(self.moved_aside):
+                # This really isn't good; what to do?
+                print("There's already a saved virtual environment,"
+                      " and another to save.", file=sys.stderr)
+                sys.exit(1)
+            os.rename(self.original, self.moved_aside)
+        return self
+
+    def __exit__(self, typ, value, tb):
+        venv = self.original or self.locate()
+        bad_build = venv + '-failed'
+
+        if os.path.isdir(bad_build):
+            print('Discarding outdated failed build.')
+            shutil.rmtree(bad_build)
+
+        if typ is None:
+            # Success.  Discard venv.
+            if venv:
+                shutil.rmtree(venv)
+        else:
+            # Failure.  Save failed build.
+            if venv:
+                print('Saving virtual environment from failed'
+                      ' build as:', bad_build)
+                os.rename(venv, bad_build)
+        if self.original:
+            os.rename(self.moved_aside, self.original)
 
 
 def error(message):
