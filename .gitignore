@@ -6,6 +6,7 @@
 /.autoversion.json
 /.coverage*
 /.tox/
+/Pipfile.lock.used
 /build/
 /dist/
 /htmlcov/

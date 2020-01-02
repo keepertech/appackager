@@ -11,6 +11,7 @@ Main entry point for building packages.
 """
 
 import configparser
+import contextlib
 import distutils.version
 import email
 import glob
@@ -113,19 +114,24 @@ class Build(object):
             print(f'Installation directory: {installation}')
 
             with SavedPipenvVenv():
-                subprocess.check_output(
-                    ['pipenv', '--bare', 'install',
-                     '--python', self.config.python])
+                with self.non_editable_pipfile_lock():
+                    subprocess.check_output(
+                        ['pipenv', '--bare', 'install',
+                         '--python', self.config.python])
 
-                # Determine where site-packages is, because we need that
-                # to locate the *.dist-info directories, so we can make
-                # use of the entry point metadata.
-                #
-                pip_init = subprocess.check_output(
-                    ['pipenv', 'run', 'python', '-c',
-                     'import os, pip\n'
-                     'print(os.path.abspath(pip.__file__))'])
-                pip_init = str(pip_init, 'utf-8').strip()
+                    # Determine where site-packages is, because we need that
+                    # to locate the *.dist-info directories, so we can make
+                    # use of the entry point metadata.
+                    #
+                    pip_init = subprocess.check_output(
+                        ['pipenv', 'run', 'python', '-c',
+                         'import os, pip\n'
+                         'print(os.path.abspath(pip.__file__))'])
+                    pip_init = str(pip_init, 'utf-8').strip()
+
+                # We no longer need to build using pipenv; that should
+                # only happen inside the context above.
+
                 self.site_packages = os.path.dirname(os.path.dirname(pip_init))
                 assert self.site_packages.endswith('/site-packages')
                 pythondir = os.path.basename(
@@ -239,6 +245,33 @@ class Build(object):
                     print(f'directory {dirpath} not empty')
                 else:
                     os.rmdir(dirpath)
+
+    @contextlib.contextmanager
+    def non_editable_pipfile_lock(self):
+        has_editable = False
+        lockname = 'Pipfile.lock'
+        tmpname = lockname + '.orig'
+
+        if os.path.isfile(lockname):
+            with open(lockname) as orig:
+                content = json.load(orig)
+                for k, v in content.items():
+                    if k in ('default', 'develop'):
+                        for pkgname, info in v.items():
+                            if info.get('editable'):
+                                has_editable = True
+                                info['editable'] = False
+
+        if has_editable:
+            os.rename(lockname, tmpname)
+            with open(lockname, 'w', encoding='utf-8') as f:
+                json.dump(content, f, indent=4, sort_keys=True)
+
+        yield
+
+        if has_editable:
+            os.rename(lockname, lockname + '.used')
+            os.rename(tmpname, lockname)
 
     def next_version(self):
         stdout = subprocess.check_output(
