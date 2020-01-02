@@ -103,9 +103,9 @@ class Configuration(object):
         return value
 
     def _dependencies(self, *names):
-        table_names, name = self._split_names(names)
+        table_names, name = self._split_names(('dependencies',) + names)
         if table_names:
-            cfg = self._get(*table_names, 'table')
+            cfg = self._get(*table_names, type='table')
         else:
             cfg = self._config
         if name in cfg:
