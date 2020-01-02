@@ -47,9 +47,9 @@ sys.path[:] = [p for p in sys.path
                if os.path.exists(p) and not p.endswith('/dist-packages')]
 
 # Add in the directory containing our application packages:
-sys.path.insert(0, os.path.join(lib_dir, "{pythondir}"))
+sys.path.insert(0, os.path.join(lib_dir, {pythondir!r}))
 
-# -- added initialization here?
+version = {version!r}
 
 import {module}
 
@@ -88,7 +88,7 @@ class Build(object):
 
     def run(self):
         workdir = os.getcwd()
-        version = self.next_version()
+        version = self.version = self.next_version()
 
         arch_specific = self.config.arch_specific
         if arch_specific:
@@ -339,10 +339,11 @@ class Build(object):
         module, object = console_scripts[name].split(':')
         script_body = SCRIPT_TEMPLATE.format(
             executable=executable,
-            initialization=script.initialization or '',
+            initialization=script.initialization,
             module=module,
-            pythondir=self.pythondir,
             object=object,
+            pythondir=self.pythondir,
+            version=self.version,
         )
         target = os.path.join(directory, script.name)
         with open(target, 'w') as f:
