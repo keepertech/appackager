@@ -296,7 +296,7 @@ class Build(object):
             ['git', 'log', '--pretty=format:%h %D'])
         stdout = str(stdout, 'utf-8')
 
-        tag = '0.0.0'
+        tag = distutils.version.StrictVersion('0.0.0')
         for line in stdout.split('\n'):
             line = line.strip()
             if not line:
@@ -312,8 +312,13 @@ class Build(object):
                     break
             self.need_autoversion = True
 
+        # We don't use str(tag) because StrictVersion.__str__ drops the
+        # third element if it's 0.  That's ambiguous, and we don't want
+        # that.
+
+        major, minor, patch = tag.version
+        suffix = ''
         if self.need_autoversion:
-            major, minor, patch = tag.version
             tag = '%d.%d.%d' % (major, minor, patch + 1)
             self.avinfo = {}
             if os.path.exists(self.config.autoversion_file):
@@ -324,14 +329,12 @@ class Build(object):
                 # Same base version; get count:
                 counter = self.avinfo.get('counter', 0) + 1
             else:
-                self.avinfo['base_version'] = str(tag)
+                self.avinfo['base_version'] = tag
                 counter = 1
             self.avinfo['counter'] = counter
-            tag += 'a' + str(counter)
-        else:
-            tag = str(tag)
+            suffix = 'a' + str(counter)
 
-        return tag
+        return '%d.%d.%d%s' % (major, minor, patch, suffix)
 
     def commit_version(self):
         if self.need_autoversion:
