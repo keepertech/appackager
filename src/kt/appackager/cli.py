@@ -77,6 +77,14 @@ class Configuration(object):
         self.conflicts = self._dependencies('conflicts')
         self.provides = self._dependencies('provides')
 
+        try:
+            self.payloads = [
+                dict(payload, name=name)
+                for name, payload in self._get('payload', type='table').items()
+            ]
+        except KeyError:
+            self.payloads = []
+
     def _get(self, *names, type='string', default=_marker):
         table_names, name = self._split_names(names)
         path = ''

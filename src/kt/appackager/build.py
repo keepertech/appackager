@@ -1,5 +1,5 @@
 """\
-(c) 2019.  Keeper Technology LLC.  All Rights Reserved.
+(c) 2019 - 2020.  Keeper Technology LLC.  All Rights Reserved.
 Use is subject to license.  Reproduction and distribution is strictly
 prohibited.
 
@@ -98,7 +98,11 @@ class Build(object):
         else:
             arch = 'all'
 
-        pkgdirname = f'{self.config.name}_{version}-1_{arch}'
+        deb_version = version
+        if 'a' in version:
+            deb_version = version.replace('a', '~a')
+
+        pkgdirname = f'{self.config.name}_{deb_version}-1_{arch}'
         debname = pkgdirname + '.deb'
 
         with tempfile.TemporaryDirectory() as tmpdir:
@@ -182,7 +186,7 @@ class Build(object):
 
             with open(debdir + '/control', 'w') as f:
                 print(f'Package: {self.config.name}', file=f)
-                print(f'Version: {version}-1', file=f)
+                print(f'Version: {deb_version}-1', file=f)
                 if self.config.description:
                     print(f'Description: {self.config.description}', file=f)
                 if self.config.maintainer:
@@ -199,6 +203,20 @@ class Build(object):
                 dependencies('requires', 'Depends')
                 dependencies('conflicts', 'Conflicts')
                 dependencies('provides', 'Provides')
+
+            for payload in self.config.payloads:
+                destination = payload['destination']
+                if '/' in destination:
+                    dest_dir, dest_name = destination.rsplit('/', 1)
+                    dest_dir = topdir + os.path.join(installation, dest_dir)
+                    if not os.path.exists(dest_dir):
+                        os.makedirs(dest_dir)
+                else:
+                    dest_dir = topdir + installation
+                    dest_name = destination
+                destination = os.path.join(dest_dir, dest_name)
+                source = os.path.join(workdir, payload['source'])
+                shutil.copy(source, destination)
 
             # Build the actual .deb:
 
@@ -294,9 +312,9 @@ class Build(object):
                     break
             self.need_autoversion = True
 
-        tag = str(tag)
-
         if self.need_autoversion:
+            major, minor, patch = tag.version
+            tag = '%d.%d.%d' % (major, minor, patch + 1)
             self.avinfo = {}
             if os.path.exists(self.config.autoversion_file):
                 with open(self.config.autoversion_file) as f:
@@ -310,6 +328,8 @@ class Build(object):
                 counter = 1
             self.avinfo['counter'] = counter
             tag += 'a' + str(counter)
+        else:
+            tag = str(tag)
 
         return tag
 
