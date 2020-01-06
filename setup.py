@@ -3,7 +3,7 @@
 import setuptools
 
 NAME = 'kt.appackager'
-VERSION = '0.0.0'
+VERSION = '0.2.0'
 LICENSE = '''\
 (c) 2019.  Keeper Technology LLC.  All Rights Reserved.
 Use is subject to license.  Reproduction and distribution is strictly
