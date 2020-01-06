@@ -67,8 +67,13 @@ class Configuration(object):
         self.hook_scripts = self._get('package', 'hook-scripts',
                                       default=DEFAULT_HOOK_SCRIPTS)
 
+        # Need to have a separate 'not-specified' / 'auto-detect' value;
+        # need not be something user can spell out explicitly.
+        #
+        # Must *not* default to False.
+        #
         self.arch_specific = self._get('package', 'architecture-specific',
-                                       type='boolean', default=False)
+                                       type='boolean', default=True)
 
         self.autoversion_file = self._get('autoversion-file',
                                           default=DEFAULT_AUTOVERSION_FILE)

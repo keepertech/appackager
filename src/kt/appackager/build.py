@@ -120,7 +120,7 @@ class Build(object):
             with SavedPipenvVenv():
                 with self.non_editable_pipfile_lock():
                     subprocess.check_output(
-                        ['pipenv', '--bare', 'install',
+                        ['pipenv', '--bare', 'sync',
                          '--python', self.config.python])
 
                     # Determine where site-packages is, because we need that
@@ -150,6 +150,17 @@ class Build(object):
                 # ---
 
                 os.chdir(self.site_packages)
+
+                # Need to determine whether any installed packages are
+                # platform-specific.  We can look at the *.dist-info
+                # directories to determine this.
+                #
+                # This affects the arch_specific flag and computed
+                # pkgdirname, topdir, debdir values.
+                #
+                # So far, we've computed paths and made directories, but
+                # all that can be delayed until this point.
+
                 pack = subprocess.Popen(
                     ['tar', 'c', '.'], stdout=subprocess.PIPE)
                 unpack = subprocess.Popen(
@@ -319,22 +330,23 @@ class Build(object):
         major, minor, patch = tag.version
         suffix = ''
         if self.need_autoversion:
-            tag = '%d.%d.%d' % (major, minor, patch + 1)
+            patch += 1
+            base = f'{major}.{minor}.{patch}'
             self.avinfo = {}
             if os.path.exists(self.config.autoversion_file):
                 with open(self.config.autoversion_file) as f:
                     self.avinfo = json.load(f)
             prev_base = self.avinfo.get('base_version')
-            if prev_base == str(tag):
+            if prev_base == base:
                 # Same base version; get count:
                 counter = self.avinfo.get('counter', 0) + 1
             else:
-                self.avinfo['base_version'] = tag
+                self.avinfo['base_version'] = base
                 counter = 1
             self.avinfo['counter'] = counter
             suffix = 'a' + str(counter)
 
-        return '%d.%d.%d%s' % (major, minor, patch, suffix)
+        return f'{major}.{minor}.{patch}{suffix}'
 
     def commit_version(self):
         if self.need_autoversion:
