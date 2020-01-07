@@ -53,9 +53,5 @@ metadata = dict(
 )
 
 
-# We rely on only running this as a script when __name__ is '__main__',
-# since mkscripts.py imports this as a module to get entry-point
-# information.
-#
 if __name__ == '__main__':
     setuptools.setup(**metadata)
