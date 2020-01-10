@@ -72,8 +72,11 @@ class Configuration(object):
         #
         # Must *not* default to False.
         #
-        self.arch_specific = self._get('package', 'architecture-specific',
-                                       type='boolean', default=True)
+        try:
+            self.arch_specific = self._get('package', 'architecture-specific',
+                                           type='boolean')
+        except KeyError:
+            self.arch_specific = None
 
         self.autoversion_file = self._get('autoversion-file',
                                           default=DEFAULT_AUTOVERSION_FILE)

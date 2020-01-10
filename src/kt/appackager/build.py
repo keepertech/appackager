@@ -90,31 +90,15 @@ class Build(object):
         workdir = os.getcwd()
         version = self.version = self.next_version()
 
-        arch_specific = self.config.arch_specific
-        if arch_specific:
-            arch = subprocess.check_output(
-                ['dpkg-architecture', '-q', 'DEB_BUILD_ARCH'])
-            arch = str(arch, 'utf-8').strip()
-        else:
-            arch = 'all'
-
         deb_version = version
         if 'a' in version:
             deb_version = version.replace('a', '~a')
 
-        pkgdirname = f'{self.config.name}_{deb_version}-1_{arch}'
-        debname = pkgdirname + '.deb'
-
         with tempfile.TemporaryDirectory() as tmpdir:
-            topdir = os.path.join(tmpdir, pkgdirname)
-            debdir = os.path.join(topdir, 'DEBIAN')
-            os.mkdir(topdir)
-            os.mkdir(debdir)
-
             installation = self.config.directory
             assert installation.startswith('/')
 
-            print(f'Building {self.config.name} in {topdir}')
+            print(f'Building package: {self.config.name}')
             print(f'Installation directory: {installation}')
 
             with SavedPipenvVenv():
@@ -138,14 +122,11 @@ class Build(object):
 
                 self.site_packages = os.path.dirname(os.path.dirname(pip_init))
                 assert self.site_packages.endswith('/site-packages')
-                pythondir = os.path.basename(
+                self.pythondir = os.path.basename(
                     os.path.dirname(self.site_packages))
-                self.pythondir = pythondir
 
+                # Clean out the things we do not need:
                 self.excise_packages()
-
-                libpython = installation + '/lib/' + pythondir
-                os.makedirs(topdir + libpython)
 
                 # ---
 
@@ -157,9 +138,38 @@ class Build(object):
                 #
                 # This affects the arch_specific flag and computed
                 # pkgdirname, topdir, debdir values.
-                #
-                # So far, we've computed paths and made directories, but
-                # all that can be delayed until this point.
+
+                arch_specific = self.config.arch_specific
+                if self.included_arch_specific_packages():
+                    if arch_specific is None:
+                        arch_specific = True
+                    elif arch_specific is False:
+                        # Configuration says false, but we have
+                        # arch-specific packages in the build.
+                        print('Including architecture specific components in'
+                              ' build, but configuration says the package is'
+                              ' architecture independent.')
+                else:
+                    arch_specific = False
+                assert isinstance(arch_specific, bool)
+
+                if arch_specific:
+                    arch = subprocess.check_output(
+                        ['dpkg-architecture', '-q', 'DEB_BUILD_ARCH'])
+                    arch = str(arch, 'utf-8').strip()
+                else:
+                    arch = 'all'
+
+                pkgdirname = f'{self.config.name}_{deb_version}-1_{arch}'
+                debname = pkgdirname + '.deb'
+
+                topdir = os.path.join(tmpdir, pkgdirname)
+                debdir = os.path.join(topdir, 'DEBIAN')
+                libpython = installation + '/lib/' + self.pythondir
+
+                os.mkdir(topdir)
+                os.mkdir(debdir)
+                os.makedirs(topdir + libpython)
 
                 pack = subprocess.Popen(
                     ['tar', 'c', '.'], stdout=subprocess.PIPE)
@@ -274,6 +284,17 @@ class Build(object):
                     print(f'directory {dirpath} not empty')
                 else:
                     os.rmdir(dirpath)
+
+    def included_arch_specific_packages(self):
+        for wheelfn in glob.glob('*.dist-info/WHEEL'):
+            with open(wheelfn) as f:
+                text = f.read()
+            message = email.message_from_string(text)
+            for tag in message.get_all('tag'):
+                pytag, abitag, platformtag = tag.split('-')
+                if platformtag != 'any':
+                    return True
+        return False
 
     @contextlib.contextmanager
     def non_editable_pipfile_lock(self):
