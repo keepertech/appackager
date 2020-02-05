@@ -1,4 +1,4 @@
-"""Keeper Technology File Analytics Service"""
+"""Application packaging for Debian-based distributions."""
 
 NAME = 'kt.appackager'
 VERSION = '0.2.0'
@@ -30,6 +30,7 @@ metadata = dict(
         'Programming Language :: Python :: 3 :: Only',
         'Programming Language :: Python :: 3.6',
         'Programming Language :: Python :: 3.7',
+        'Programming Language :: Python :: 3.8',
     ],
 )
 
