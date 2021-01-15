@@ -13,13 +13,14 @@ maintainer = "Keeper Technology LLC"
 # specification in Debian syntax.
 
 requires = [
-  "kt-python37",
+  "dpkg-dev",
+  "kt-python38",
 ]
 
 
 [installation]
 directory = "/opt/appackager"
-python = "/opt/kt-python37/bin/python3"
+python = "/opt/kt-python38/bin/python3"
 
 
 [script.appackage]
