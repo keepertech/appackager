@@ -15,6 +15,7 @@ maintainer = "Keeper Technology LLC"
 requires = [
   "dpkg-dev",
   "kt-python38",
+  "lsb-release",
 ]
 
 

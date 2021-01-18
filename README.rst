@@ -10,6 +10,9 @@ Release history
    directory trees as well as individual files.
    https://kt-git.keepertech.com/DevTools/appackager/issues/6
 
+#. Include distribution identification in architecture-specific builds.
+   https://kt-git.keepertech.com/DevTools/appackager/issues/5
+
 
 0.3.0 (2020-01-10)
 ~~~~~~~~~~~~~~~~~~

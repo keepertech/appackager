@@ -157,6 +157,16 @@ class Build(object):
                     arch = subprocess.check_output(
                         ['dpkg-architecture', '-q', 'DEB_BUILD_ARCH'])
                     arch = str(arch, 'utf-8').strip()
+
+                    distro_name = subprocess.check_output(
+                        ['lsb_release', '--id', '--short'])
+                    distro_name = str(distro_name, 'utf-8').strip()
+
+                    distro_version = subprocess.check_output(
+                        ['lsb_release', '--release', '--short'])
+                    distro_version = str(distro_version, 'utf-8').strip()
+
+                    deb_version += distro_name.lower() + distro_version
                 else:
                     arch = 'all'
 
