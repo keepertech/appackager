@@ -237,7 +237,10 @@ class Build(object):
                     dest_name = destination
                 destination = os.path.join(dest_dir, dest_name)
                 source = os.path.join(workdir, payload['source'])
-                shutil.copy(source, destination)
+                if os.path.isdir(source):
+                    shutil.copytree(source, destination)
+                else:
+                    shutil.copy(source, destination)
 
             # Build the actual .deb:
 
