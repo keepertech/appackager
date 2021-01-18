@@ -153,6 +153,7 @@ class Build(object):
                     arch_specific = False
                 assert isinstance(arch_specific, bool)
 
+                build = '1'
                 if arch_specific:
                     arch = subprocess.check_output(
                         ['dpkg-architecture', '-q', 'DEB_BUILD_ARCH'])
@@ -166,11 +167,11 @@ class Build(object):
                         ['lsb_release', '--release', '--short'])
                     distro_version = str(distro_version, 'utf-8').strip()
 
-                    deb_version += distro_name.lower() + distro_version
+                    build += distro_name.lower() + distro_version
                 else:
                     arch = 'all'
 
-                pkgdirname = f'{self.config.name}_{deb_version}-1_{arch}'
+                pkgdirname = f'{self.config.name}_{deb_version}-{build}_{arch}'
                 debname = pkgdirname + '.deb'
 
                 topdir = os.path.join(tmpdir, pkgdirname)

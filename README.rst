@@ -6,6 +6,8 @@ appackager -- build .deb packages using pipenv
 Release history
 ---------------
 
+#. Fix inclusion of distribution identification in built package.
+
 
 0.4.0 (2021-01-18)
 ~~~~~~~~~~~~~~~~~~
