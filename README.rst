@@ -6,6 +6,10 @@ appackager -- build .deb packages using pipenv
 Release history
 ---------------
 
+
+0.4.0 (2021-01-18)
+~~~~~~~~~~~~~~~~~~
+
 #. Update support for ``payload`` configuration sections to support
    directory trees as well as individual files.
    https://kt-git.keepertech.com/DevTools/appackager/issues/6
