@@ -6,6 +6,10 @@ appackager -- build .deb packages using pipenv
 Release history
 ---------------
 
+
+0.4.2 (2021-02-10)
+~~~~~~~~~~~~~~~~~~
+
 #. Incorporate computed build tag, including distro version if
    applicable, in package version recorded in metadata.
 
