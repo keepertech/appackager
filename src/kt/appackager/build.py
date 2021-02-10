@@ -218,7 +218,7 @@ class Build(object):
 
             with open(debdir + '/control', 'w') as f:
                 print(f'Package: {self.config.name}', file=f)
-                print(f'Version: {deb_version}-1', file=f)
+                print(f'Version: {deb_version}-{build}', file=f)
                 if self.config.description:
                     print(f'Description: {self.config.description}', file=f)
                 if self.config.maintainer:
