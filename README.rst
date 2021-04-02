@@ -6,6 +6,10 @@ appackager -- build .deb packages using pipenv
 Release history
 ---------------
 
+#. If there's no setup.py in the package being built, and we actually
+   need to identify the local package, also check in setup.cfg or
+   pyproject.toml.  Report which source provided the name.
+
 
 0.4.2 (2021-02-10)
 ~~~~~~~~~~~~~~~~~~

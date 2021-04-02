@@ -424,6 +424,7 @@ class Build(object):
         if self._local_package:
             return self._local_package
 
+        found = None
         if self._local_package is None:
             if os.path.exists('setup.py'):
                 appackagerdir = os.path.dirname(os.path.abspath(__file__))
@@ -437,12 +438,45 @@ class Build(object):
                     with open(os.path.join(dist_info, 'METADATA')) as f:
                         msg = email.message_from_file(f)
                         self._local_package = msg['name']
+                        found = 'using setup.py'
+
+            elif os.path.exists('setup.cfg'):
+                conf = configparser.ConfigParser(interpolation=None)
+                with open('setup.cfg') as f:
+                    conf.read_file(f, 'setup.cfg')
+                try:
+                    self._local_package = conf.get('metadata', 'name')
+                except configparser.Error:
+                    print(f'[script.{script.name}] entrypoint refers to the'
+                          f' local package, but the package name is not'
+                          f' present in setup.cfg',
+                          file=sys.stderr)
+                    sys.exit(1)
+                else:
+                    found = 'in setup.cfg'
+
+            elif os.path.exists('pyproject.toml'):
+                conf = toml.load('pyproject.toml')
+                project = conf.get('project')
+                if isinstance(project, dict):
+                    name = project.get('name')
+                    if isinstance(name, str):
+                        self._local_package = name
+                        found = 'in pyproject.toml'
+
+                if not self._local_package:
+                    print(f'[script.{script.name}] entrypoint refers to the'
+                          f' local package, but the package name could not'
+                          f' be located in pyproject.toml',
+                          file=sys.stderr)
+                    sys.exit(1)
 
         if not self._local_package:
-            print(f'[script.{script.name}] entrypoint refers to the'
-                  f' local package, but there is no setup.py',
+            print(f'[script.{script.name}] entrypoint refers to the local'
+                  f' package, but package metadata could not be located',
                   file=sys.stderr)
             sys.exit(1)
+        print(f'extracted local package name {self._local_package!r} {found}')
         return self._local_package
 
     def get_console_scripts(self, pkgname):
@@ -451,7 +485,7 @@ class Build(object):
         entry_point_path = os.path.join(distinfo, 'entry_points.txt')
         try:
             with open(entry_point_path) as f:
-                cfg = configparser.RawConfigParser()
+                cfg = configparser.ConfigParser(interpolation=None)
                 cfg.read_file(f, entry_point_path)
                 for name in cfg.options('console_scripts'):
                     console_scripts[name] = cfg.get('console_scripts', name)
