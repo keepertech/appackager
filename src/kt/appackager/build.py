@@ -358,6 +358,12 @@ class Build(object):
                     break
             self.need_autoversion = True
 
+        if not self.need_autoversion:
+            # Check for local changes in the working copy:
+            stdout = subprocess.check_output(
+                ['git', 'status', '--porcelain', '.'])
+            self.need_autoversion = bool(stdout.strip())
+
         # We don't use str(tag) because StrictVersion.__str__ drops the
         # third element if it's 0.  That's ambiguous, and we don't want
         # that.

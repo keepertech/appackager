@@ -10,6 +10,10 @@ Release history
    need to identify the local package, also check in setup.cfg or
    pyproject.toml.  Report which source provided the name.
 
+#. Recognize need to auto-version a pre-release when there are local
+   changes directly over a tagged release.
+   https://kt-git.keepertech.com/DevTools/appackager/-/issues/7
+
 
 0.4.2 (2021-02-10)
 ~~~~~~~~~~~~~~~~~~
@@ -29,10 +33,10 @@ Release history
 
 #. Update support for ``payload`` configuration sections to support
    directory trees as well as individual files.
-   https://kt-git.keepertech.com/DevTools/appackager/issues/6
+   https://kt-git.keepertech.com/DevTools/appackager/-/issues/6
 
 #. Include distribution identification in architecture-specific builds.
-   https://kt-git.keepertech.com/DevTools/appackager/issues/5
+   https://kt-git.keepertech.com/DevTools/appackager/-/issues/5
 
 
 0.3.0 (2020-01-10)
