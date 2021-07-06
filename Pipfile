@@ -7,4 +7,4 @@ url = "https://keeper:Keeper1SS@devpi.keepertech.com/keeper/prod/+simple/"
 toml = "*"
 wheel = "*"
 
-e1839a8 = {path = ".", editable = true}
+"kt.appackager" = {path = ".", editable = true}

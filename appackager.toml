@@ -14,14 +14,14 @@ maintainer = "Keeper Technology LLC"
 
 requires = [
   "dpkg-dev",
-  "kt-python38",
+  "kt-python39",
   "lsb-release",
 ]
 
 
 [installation]
 directory = "/opt/appackager"
-python = "/opt/kt-python38/bin/python3"
+python = "/opt/kt-python39/bin/python3"
 
 
 [script.appackage]
