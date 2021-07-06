@@ -51,9 +51,9 @@ sys.path.insert(0, os.path.join(lib_dir, {pythondir!r}))
 
 version = {version!r}
 
+{initialization}
 import {module}
 
-{initialization}
 if __name__ == "__main__":
     sys.exit({module}.{object}())
 '''

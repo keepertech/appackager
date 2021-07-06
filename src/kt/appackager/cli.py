@@ -143,6 +143,10 @@ class Configuration(object):
 
     def _scripts(self):
         initialization = self._get('scripts', 'initialization', default='')
+        if initialization.rstrip():
+            initialization = initialization.rstrip() + '\n'
+        else:
+            initialization = ''
         section = self._config.get('script', {})
         if not isinstance(section, dict):
             raise TypeError('[script] must be a table')
