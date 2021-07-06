@@ -11,6 +11,9 @@ Release history
    warning configurations to be arranged before too many imports have
    been executed.
 
+#. Support configuration of the packages that should be excised from the
+   installation before the platform package is built.
+
 
 0.5.0 (2021-04-02)
 ~~~~~~~~~~~~~~~~~~

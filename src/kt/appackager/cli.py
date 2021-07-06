@@ -43,6 +43,7 @@ class ArgumentParser(argparse.ArgumentParser):
 _marker = object()
 
 _toml_types = {
+    'array': list,
     'boolean': bool,
     'float': float,
     'integer': int,
@@ -62,6 +63,9 @@ class Configuration(object):
         self.priority = self._config['package'].get('priority', 'optional')
         self.scripts = self._scripts()
         self.directory = self._get('installation', 'directory')
+        self.packages_to_excise = self._get('installation', 'excise-packages',
+                                            type='array',
+                                            default=['pip', 'setuptools'])
         self.python = self._get('installation', 'python')
 
         self.hook_scripts = self._get('package', 'hook-scripts',

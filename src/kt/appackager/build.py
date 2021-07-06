@@ -71,13 +71,6 @@ class Build(object):
 
     need_autoversion = False
 
-    # We excise these since they're part of the base Python installation
-    # now.
-    packages_to_excise = (
-        'pip',
-        'setuptools',
-    )
-
     def __init__(self, config):
         self.config = config
         self.console_scripts = {}
@@ -275,7 +268,8 @@ class Build(object):
         outside_prefix = os.pardir + os.sep
         # The set of dirs in site-packages we touched.
         dirs = set()
-        for pkgname in self.packages_to_excise:
+        print('preparing to excise:', self.config.packages_to_excise)
+        for pkgname in self.config.packages_to_excise:
             distinfo = self.get_package_distinfo(pkgname)
             record = os.path.join(distinfo, 'RECORD')
             for line in open(record):
