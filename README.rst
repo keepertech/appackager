@@ -6,6 +6,10 @@ appackager -- build .deb packages using pipenv
 Release history
 ---------------
 
+
+0.6.0 (2021-07-06)
+~~~~~~~~~~~~~~~~~~
+
 #. Run script initialization before importing the module providing the
    configured console script entry point.  This allows things like
    warning configurations to be arranged before too many imports have
