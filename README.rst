@@ -7,6 +7,12 @@ Release history
 ---------------
 
 
+0.6.1 (2022-08-23)
+~~~~~~~~~~~~~~~~~~
+
+#. Fix missing import of TOML parser for reading pyproject.toml files.
+
+
 0.6.0 (2021-07-06)
 ~~~~~~~~~~~~~~~~~~
 

@@ -25,6 +25,8 @@ import sys
 import tempfile
 import textwrap
 
+import toml
+
 import kt.appackager.cli
 
 

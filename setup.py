@@ -1,7 +1,7 @@
 """Application packaging for Debian-based distributions."""
 
 NAME = 'kt.appackager'
-VERSION = '0.6.0'
+VERSION = '0.6.1'
 LICENSE = 'file: LICENSE.txt'
 
 
