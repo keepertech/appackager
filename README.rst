@@ -7,7 +7,7 @@ Release history
 ---------------
 
 
-0.6.2 (unreleased)
+0.6.2 (2022-09-23)
 ~~~~~~~~~~~~~~~~~~
 
 #. Fix reliability issue in locating dist-info directory for an
