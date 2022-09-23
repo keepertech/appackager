@@ -7,6 +7,17 @@ Release history
 ---------------
 
 
+0.6.2 (unreleased)
+~~~~~~~~~~~~~~~~~~
+
+#. Fix reliability issue in locating dist-info directory for an
+   installed package.
+   https://kt-git.keepertech.com/DevTools/appackager/-/issues/8
+
+#. When excising a package that should not be installed, remove the
+   left-over empty dist-info directory from that package.
+
+
 0.6.1 (2022-08-23)
 ~~~~~~~~~~~~~~~~~~
 

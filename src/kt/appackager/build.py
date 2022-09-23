@@ -14,6 +14,7 @@ import configparser
 import contextlib
 import distutils.version
 import email
+import fnmatch
 import glob
 import json
 import logging
@@ -283,6 +284,8 @@ class Build(object):
                 path = os.path.normpath(os.path.join(self.site_packages, path))
                 if os.path.exists(path):
                     os.unlink(path)
+            # Avoid leaving an empty dist-info directory, even temporarily.
+            os.rmdir(distinfo)
         for dirname in dirs:
             path = os.path.normpath(os.path.join(self.site_packages, dirname))
             for dirpath, dirnames, filenames in os.walk(path, topdown=False):
@@ -496,10 +499,33 @@ class Build(object):
         self.console_scripts[pkgname] = console_scripts
 
     def get_package_distinfo(self, pkgname):
-        pattern = os.path.join(self.site_packages, f'{pkgname}-*.dist-info')
-        dirs = glob.glob(pattern)
-        assert len(dirs) == 1, dirs
-        return dirs[0]
+        #
+        # Looping over all the dist-info directories doesn't seem very
+        # efficient, but is reliable in the face of concerns regarding
+        # package name normalization described in:
+        #
+        # https://discuss.python.org/t/
+        # revisiting-distribution-name-normalization/
+        #
+        for fn in fnmatch.filter(os.listdir(self.site_packages),
+                                 '*.dist-info'):
+            mdpath = os.path.join(self.site_packages, fn, 'METADATA')
+
+            # While excising packages that are not wanted, an empty
+            # dist-info directory can get left behind temporarily; we
+            # want to be resilient in that case.
+            #
+            # This should no longer happen with changes in the excise
+            # code, but has been observed during the evolution of this.
+            #
+            if not os.path.exists(mdpath):
+                continue
+
+            with open(mdpath) as f:
+                msg = email.message_from_file(f)
+                if msg['name'] == pkgname:
+                    return os.path.join(self.site_packages, fn)
+        return None
 
 
 class SavedPipenvVenv(object):
