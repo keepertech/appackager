@@ -9,5 +9,6 @@
 /Pipfile.lock.used
 /build/
 /dist/
+/docs/build/
 /htmlcov/
 /packages/
