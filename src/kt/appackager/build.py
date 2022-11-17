@@ -376,15 +376,14 @@ class Build(object):
             if os.path.exists(self.config.autoversion_file):
                 with open(self.config.autoversion_file) as f:
                     self.avinfo = json.load(f)
-            prev_base = self.avinfo.get('base_version')
-            if prev_base == base:
-                # Same base version; get count:
-                counter = self.avinfo.get('counter', 0) + 1
-            else:
-                self.avinfo['base_version'] = base
-                counter = 1
-            self.avinfo['counter'] = counter
-            suffix = 'a' + str(counter)
+            if base not in self.avinfo:
+                if 'base_version' in self.avinfo:
+                    prev_base = self.avinfo['base_version']
+                    self.avinfo[prev_base] = self.avinfo.pop('counter', 0)
+                    del self.avinfo['base_version']
+            counter = self.avinfo.get(base, 0) + 1
+            self.avinfo[base] = counter
+            suffix = f'a{counter}'
 
         return f'{major}.{minor}.{patch}{suffix}'
 

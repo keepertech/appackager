@@ -6,6 +6,13 @@ appackager -- build .deb packages using pipenv
 Release history
 ---------------
 
+0.7.0 (unreleased)
+~~~~~~~~~~~~~~~~~~
+
+#. Store last alpha for each base version, to better support switching
+   branches in working copy.
+   https://kt-git.keepertech.com/DevTools/appackager/-/issues/9
+
 
 0.6.2 (2022-09-23)
 ~~~~~~~~~~~~~~~~~~
