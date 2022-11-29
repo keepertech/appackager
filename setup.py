@@ -2,7 +2,7 @@
 
 NAME = 'kt.appackager'
 VERSION = '0.6.2'
-LICENSE = 'file: LICENSE.txt'
+LICENSE = 'file: LICENSE.rst'
 
 
 metadata = dict(
