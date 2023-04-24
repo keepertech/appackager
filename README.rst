@@ -11,7 +11,6 @@ Release history
 
 #. Store last alpha for each base version, to better support switching
    branches in working copy.
-   https://kt-git.keepertech.com/DevTools/appackager/-/issues/9
 
 
 0.6.2 (2022-09-23)
@@ -19,7 +18,6 @@ Release history
 
 #. Fix reliability issue in locating dist-info directory for an
    installed package.
-   https://kt-git.keepertech.com/DevTools/appackager/-/issues/8
 
 #. When excising a package that should not be installed, remove the
    left-over empty dist-info directory from that package.
@@ -52,7 +50,6 @@ Release history
 
 #. Recognize need to auto-version a pre-release when there are local
    changes directly over a tagged release.
-   https://kt-git.keepertech.com/DevTools/appackager/-/issues/7
 
 
 0.4.2 (2021-02-10)
@@ -73,10 +70,8 @@ Release history
 
 #. Update support for ``payload`` configuration sections to support
    directory trees as well as individual files.
-   https://kt-git.keepertech.com/DevTools/appackager/-/issues/6
 
 #. Include distribution identification in architecture-specific builds.
-   https://kt-git.keepertech.com/DevTools/appackager/-/issues/5
 
 
 0.3.0 (2020-01-10)
