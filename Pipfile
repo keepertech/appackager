@@ -1,7 +1,7 @@
 # -*- toml -*-
 
 [packages]
-toml = "*"
+tomli = "*"
 wheel = "*"
 
 "kt.appackager" = {path = ".", editable = true}

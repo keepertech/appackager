@@ -15,10 +15,9 @@ metadata = dict(
     description=__doc__,
     packages=['kt.appackager'],
     package_dir={'': 'src'},
-    namespace_packages=['kt'],
     include_package_data=True,
     install_requires=[
-        'toml',
+        'tomli',
         'wheel',
     ],
     entry_points={
@@ -28,11 +27,12 @@ metadata = dict(
     },
     classifiers=[
         'Programming Language :: Python :: 3 :: Only',
-        'Programming Language :: Python :: 3.6',
         'Programming Language :: Python :: 3.7',
         'Programming Language :: Python :: 3.8',
         'Programming Language :: Python :: 3.9',
         'Programming Language :: Python :: 3.10',
+        'Programming Language :: Python :: 3.11',
+        'Programming Language :: Python :: 3.12',
     ],
 )
 

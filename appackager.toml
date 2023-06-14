@@ -1,7 +1,7 @@
 
 [package]
 # Name of operating system package
-name = "kt-appackager"
+name = "appackager"
 
 description = "Keeper Technology application builder."
 maintainer = "Keeper Technology LLC"
@@ -14,14 +14,14 @@ maintainer = "Keeper Technology LLC"
 
 requires = [
   "dpkg-dev",
-  "kt-python39",
+  "cleanpython311",
   "lsb-release",
 ]
 
 
 [installation]
 directory = "/opt/appackager"
-python = "/opt/kt-python39/bin/python3"
+python = "/opt/cleanpython311/bin/python3"
 
 
 [script.appackage]
