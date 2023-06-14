@@ -6,7 +6,7 @@ appackager -- build .deb packages using pipenv
 Release history
 ---------------
 
-0.7.0 (unreleased)
+0.7.0 (2023-06-14)
 ~~~~~~~~~~~~~~~~~~
 
 #. Store last alpha for each base version, to better support switching
