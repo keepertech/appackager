@@ -11,6 +11,12 @@ Release history
 
 #. Store last alpha for each base version, to better support switching
    branches in working copy.
+#. Switch to ``tomli`` for TOML parsing; older ``toml`` library appears
+   to have disappeared.
+#. Remove "kt-" from package name.
+#. Update supported Python versions.
+#. Avoid deprecation warnings from updated packaging libraries.
+#. Excise nothing by default.
 
 
 0.6.2 (2022-09-23)

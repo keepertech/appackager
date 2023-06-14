@@ -19,7 +19,7 @@ import sys
 import tempfile
 import textwrap
 
-import toml
+import tomli
 
 import kt.appackager.cli
 
@@ -428,8 +428,10 @@ class Build(object):
                 site_packages = os.path.dirname(os.path.dirname(appackagerdir))
                 with tempfile.TemporaryDirectory() as tmpdir:
                     subprocess.check_call(
-                        [self.config.python, 'setup.py', '-q',
-                         'dist_info', '--egg-base', tmpdir],
+                        # sys.executable here is from the running appackager
+                        # build, so includes the required wheel support:
+                        [sys.executable, 'setup.py', '-q',
+                         'dist_info', '--output-dir', tmpdir],
                         env={'PYTHONPATH': site_packages})
                     dist_info = os.path.join(tmpdir, os.listdir(tmpdir)[0])
                     with open(os.path.join(dist_info, 'METADATA')) as f:
@@ -453,7 +455,8 @@ class Build(object):
                     found = 'in setup.cfg'
 
             elif os.path.exists('pyproject.toml'):
-                conf = toml.load('pyproject.toml')
+                with open('pyproject.toml', 'rb') as ppf:
+                    conf = tomli.load(ppf)
                 project = conf.get('project')
                 if isinstance(project, dict):
                     name = project.get('name')

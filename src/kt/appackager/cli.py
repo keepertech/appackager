@@ -6,7 +6,7 @@ Command-line & configuration-loading support.
 import argparse
 import logging
 
-import toml
+import tomli
 
 
 DEFAULT_AUTOVERSION_FILE = '.autoversion.json'
@@ -29,7 +29,8 @@ class ArgumentParser(argparse.ArgumentParser):
     def parse_args(self):
         self.add_argument('settings', nargs="*")
         namespace = super(ArgumentParser, self).parse_args()
-        namespace.config = Configuration(toml.load(namespace.configuration))
+        with open(namespace.configuration, 'rb') as cf:
+            namespace.config = Configuration(tomli.load(cf))
         return namespace
 
 
@@ -58,7 +59,7 @@ class Configuration(object):
         self.directory = self._get('installation', 'directory')
         self.packages_to_excise = self._get('installation', 'excise-packages',
                                             type='array',
-                                            default=['pip', 'setuptools'])
+                                            default=[])
         self.python = self._get('installation', 'python')
 
         self.hook_scripts = self._get('package', 'hook-scripts',
