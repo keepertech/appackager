@@ -1,8 +1,5 @@
 # -*- toml -*-
 
-[[source]]
-url = "https://keeper:Keeper1SS@devpi.keepertech.com/keeper/prod/+simple/"
-
 [packages]
 toml = "*"
 wheel = "*"
