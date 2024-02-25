@@ -30,8 +30,15 @@ SCRIPT_TEMPLATE = '''\
 import os
 import sys
 
-bin_dir = os.path.dirname(os.path.abspath(__file__))
-top_dir = os.path.dirname(bin_dir)
+
+def unlinkify(path):
+    if os.path.islink(path):
+        return os.path.realpath(path)
+    else:
+        return os.path.abspath(path)
+
+bin_dir = os.path.dirname(unlinkify(__file__))
+top_dir = os.path.dirname(unlinkify(bin_dir))
 lib_dir = os.path.join(top_dir, "lib")
 
 for unwanted in ('', bin_dir):

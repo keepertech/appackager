@@ -6,6 +6,15 @@ appackager -- build .deb packages using pipenv
 Release history
 ---------------
 
+
+0.8.0 (2024-02-25)
+~~~~~~~~~~~~~~~~~~
+
+#. Allow use of a symlink to provide more convenient access to installed
+   scripts without failing to locate the installed Python packages.
+   https://github.com/keepertech/appackager/issues/3
+
+
 0.7.0 (2023-06-14)
 ~~~~~~~~~~~~~~~~~~
 
