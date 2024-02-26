@@ -7,6 +7,10 @@ Release history
 ---------------
 
 #. Add Python 3.12 to default test plan.  Removed Python prior to 3.10.
+#. Added **--set-version** option to set the version of the generated Debian
+   package file when building a package where the git repository is not
+   available.
+   https://github.com/keepertech/appackager/issues/4
 
 
 0.8.0 (2024-02-25)

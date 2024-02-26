@@ -337,6 +337,20 @@ class Build(object):
             os.rename(tmpname, lockname)
 
     def next_version(self):
+        if os.path.exists('.git'):
+            if self.config.set_version:
+                print('cannot use --set-version when used in conjunction'
+                      ' with a git repository', file=sys.stderr)
+                sys.exit(1)
+            return self.next_version_from_git()
+        elif self.config.set_version:
+            return self.config.set_version
+        else:
+            print('use --set-version when running without access to a'
+                  ' git repository', file=sys.stderr)
+            sys.exit(1)
+
+    def next_version_from_git(self):
         stdout = subprocess.check_output(
             ['git', 'log', '--pretty=format:%h %D'])
         stdout = str(stdout, 'utf-8')

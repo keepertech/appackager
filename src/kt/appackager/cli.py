@@ -21,16 +21,17 @@ class ArgumentParser(argparse.ArgumentParser):
         super(ArgumentParser, self).__init__(*args, **kwargs)
         self.set_defaults(verbose=0)
         self.add_argument('-c', '--configuration', default='appackager.toml')
+        self.add_argument('--set-version', action='store')
         vg = self.add_mutually_exclusive_group()
         vg.add_argument('-v', '--verbose', action='count')
         vg.add_argument('--verbosity', action='store',
                         dest='verbose', type=int)
 
     def parse_args(self):
-        self.add_argument('settings', nargs="*")
         namespace = super(ArgumentParser, self).parse_args()
         with open(namespace.configuration, 'rb') as cf:
             namespace.config = Configuration(tomli.load(cf))
+        namespace.config.set_version = namespace.set_version
         return namespace
 
 
