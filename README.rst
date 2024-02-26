@@ -6,6 +6,8 @@ appackager -- build .deb packages using pipenv
 Release history
 ---------------
 
+#. Add Python 3.12 to default test plan.  Removed Python prior to 3.10.
+
 
 0.8.0 (2024-02-25)
 ~~~~~~~~~~~~~~~~~~
