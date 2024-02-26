@@ -6,6 +6,10 @@ appackager -- build .deb packages using pipenv
 Release history
 ---------------
 
+
+0.9.0 (2024-02-26)
+~~~~~~~~~~~~~~~~~~
+
 #. Add Python 3.12 to default test plan.  Removed Python prior to 3.10.
 #. Added **--set-version** option to set the version of the generated Debian
    package file when building a package where the git repository is not
